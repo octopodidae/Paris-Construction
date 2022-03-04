@@ -1,0 +1,527 @@
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>Paris Construction</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.21/esri/themes/dark/main.css" />
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+  <script src="https://js.arcgis.com/4.21/"></script>
+  <script>
+    function hoverLink() {
+      document.querySelector(".svg-icon").style.fill = "#f0f";
+      document.querySelector("#apiJS").style.color = "#f0f";
+    }
+
+    function outLink() {
+      document.querySelector(".svg-icon").style.fill = "#d1d1d1";
+      document.querySelector("#apiJS").style.color = "#d1d1d1";
+    }
+
+    function hoverLink2() {
+      document.querySelector("#openDataUrl").style.color = "#f0f";
+    }
+
+    function outLink2() {
+      document.querySelector("#openDataUrl").style.color = "#d1d1d1";
+    }
+  </script>
+  <script>
+    require([
+      "esri/Map",
+      "esri/layers/FeatureLayer",
+      "esri/views/MapView",
+      "esri/core/promiseUtils",
+      "esri/widgets/Legend",
+      "esri/widgets/Home",
+      "esri/widgets/Slider",
+      "esri/config"
+    ], (Map, FeatureLayer, MapView, promiseUtils, Legend, Home, Slider, esriConfig) => {
+      esriConfig.apiKey = "AAPK551c88f8d25e4cb6a6fa84e30ea07c240tXPQnH9X28B5uBat8NrS16NXKresOv90auUds7afDCcdpnlA4rLVheETm_yQlL_";
+      const applicationDiv = document.getElementById("applicationDiv");
+      const sliderValue = document.getElementById("sliderValue");
+      const playButton = document.getElementById("playButton");
+      const myContainer = document.getElementById("myContainer");
+      const arr1 = $("#arr1");
+      const arr2 = $("#arr2");
+      const arr3 = $("#arr3");
+      const arr4 = $("#arr4");
+      const arr5 = $("#arr5");
+      const arr6 = $("#arr6");
+      const arr7 = $("#arr7");
+      const arr8 = $("#arr8");
+      const arr9 = $("#arr9");
+      const arr10 = $("#arr10");
+      const arr11 = $("#arr11");
+      const arr12 = $("#arr12");
+      const arr13 = $("#arr13");
+      const arr14 = $("#arr14");
+      const arr15 = $("#arr15");
+      const arr16 = $("#arr16");
+      const arr17 = $("#arr17");
+      const arr18 = $("#arr18");
+      const arr19 = $("#arr19");
+      const arr20 = $("#arr20");
+      let animation = null;
+      const layer = new FeatureLayer({
+        portalItem: {
+          id: "5ae77b61ae6e474f8609e1bb73ef9448"
+        },
+        definitionExpression: "an_const > 99",
+        effect: "bloom(2.5 0 0.5)"
+      });
+      const map = new Map({
+        basemap: "dark-gray-vector",
+        layers: [layer]
+      });
+      const view = new MapView({
+        map: map,
+        container: "viewDiv",
+        center: [2.340640365234307, 48.858889699999175],
+        zoom: 12,
+        constraints: {
+          minScale: 144447.638572
+        },
+      });
+      const slider = new Slider({
+        container: "slider",
+        min: 1821,
+        max: 2021,
+        values: [1821],
+        step: 1,
+        visibleElements: {
+          rangeLabels: true
+        }
+      });
+
+      function inputHandler(event) {
+        stopAnimation();
+        setYear(event.value);
+      }
+      slider.on("thumb-drag", inputHandler);
+      playButton.addEventListener("click", () => {
+        if (playButton.classList.contains("toggled")) {
+          stopAnimation();
+        } else {
+          startAnimation();
+        }
+      });
+      view.ui.move("zoom", "top-right");
+      view.ui.add([{
+          component: myContainer,
+          position: "top-left"
+        },
+        {
+          component: new Home({
+            view: view
+          }),
+          position: "top-right"
+        }
+      ]);
+      view.ui.add(
+        new Legend({
+          view: view
+        }),
+        "bottom-right"
+      );
+      view.whenLayerView(layer).then(setupHoverTooltip);
+      setYear(1821);
+
+      function setYear(value) {
+        sliderValue.innerHTML = Math.floor(value);
+        slider.viewModel.setValue(0, value);
+        layer.renderer = createRenderer(value);
+      }
+
+      function createRenderer(year) {
+        const opacityStops = [{
+            opacity: 1,
+            value: year
+          },
+          {
+            opacity: 0,
+            value: year + 1
+          }
+        ];
+        return {
+          type: "simple",
+          symbol: {
+            type: "simple-fill",
+            color: "rgb(0, 0, 0)",
+            outline: null
+          },
+          visualVariables: [{
+              type: "opacity",
+              field: "an_const",
+              stops: opacityStops,
+              legendOptions: {
+                showLegend: false
+              }
+            },
+            {
+              type: "color",
+              field: "an_const",
+              legendOptions: {
+                title: "Construction :"
+              },
+              stops: [{
+                  value: year,
+                  color: "#0ff",
+                  label: "en " + (Math.floor(year))
+                },
+                {
+                  value: year - 10,
+                  color: "#f0f",
+                  label: "en " + (Math.floor(year) - 20)
+                },
+                {
+                  value: year - 50,
+                  color: "#404",
+                  label: "avant " + (Math.floor(year) - 50)
+                }
+              ]
+            }
+          ]
+        };
+      }
+
+      function setupHoverTooltip(layerview) {
+        let highlight;
+        const tooltip = createTooltip();
+        const hitTest = promiseUtils.debounce((event) => {
+          return view.hitTest(event)
+            .then((hit) => {
+              const results = hit.results.filter((result) => {
+                return result.graphic.layer === layer;
+              });
+              if (!results.length) {
+                return null;
+              }
+              return {
+                graphic: results[0].graphic,
+                screenPoint: hit.screenPoint
+              };
+            });
+        });
+        view.on("pointer-move", (event) => {
+          return hitTest(event)
+            .then((hit) => {
+              if (highlight) {
+                highlight.remove();
+                highlight = null;
+              }
+              if (hit) {
+                const graphic = hit.graphic;
+                const screenPoint = hit.screenPoint;
+                highlight = layerview.highlight(graphic);
+                tooltip.show(screenPoint, "Construit en " + graphic.getAttribute("an_const"));
+              } else {
+                tooltip.hide();
+              }
+            }, () => {});
+        });
+      }
+
+      function startAnimation() {
+        stopAnimation();
+        animation = animate(slider.values[0]);
+        playButton.classList.add("toggled");
+      }
+
+      function stopAnimation() {
+        if (!animation) {
+          return;
+        }
+        animation.remove();
+        animation = null;
+        playButton.classList.remove("toggled");
+      }
+
+      function animate(startValue) {
+        let animating = true;
+        let value = startValue;
+        const frame = (timestamp) => {
+          if (!animating) {
+            return;
+          }
+          value += 0.5;
+          if (value > 2021) {
+            value = 1821;
+          }
+          setYear(value);
+          setTimeout(() => {
+            requestAnimationFrame(frame);
+          }, 1000 / 30);
+        };
+        frame();
+        return {
+          remove: () => {
+            animating = false;
+          }
+        };
+      }
+
+      function createTooltip() {
+        const tooltip = document.createElement("div");
+        const style = tooltip.style;
+        tooltip.setAttribute("role", "tooltip");
+        tooltip.classList.add("tooltip");
+        const textElement = document.createElement("div");
+        textElement.classList.add("esri-widget");
+        tooltip.appendChild(textElement);
+        view.container.appendChild(tooltip);
+        let x = 0;
+        let y = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let visible = false;
+
+        function move() {
+          x += (targetX - x) * 0.1;
+          y += (targetY - y) * 0.1;
+          if (Math.abs(targetX - x) < 1 && Math.abs(targetY - y) < 1) {
+            x = targetX;
+            y = targetY;
+          } else {
+            requestAnimationFrame(move);
+          }
+          style.transform = "translate3d(" + Math.round(x) + "px," + Math.round(y) + "px, 0)";
+        }
+        return {
+          show: (point, text) => {
+            if (!visible) {
+              x = point.x;
+              y = point.y;
+            }
+            targetX = point.x;
+            targetY = point.y;
+            style.opacity = 1;
+            visible = true;
+            textElement.innerHTML = text;
+            move();
+          },
+          hide: () => {
+            style.opacity = 0;
+            visible = false;
+          }
+        };
+      }
+      arr1.click(function() {
+        console.log("arr1");
+        view.goTo({
+          center: [2.33644336205, 48.8625627018],
+          zoom: 14
+        });
+      });
+      arr2.click(function() {
+        console.log("arr2");
+        view.goTo({
+          center: [2.34280254689, 48.8682792225],
+          zoom: 14
+        });
+      });
+      arr3.click(function() {
+        console.log("arr3");
+        view.goTo({
+          center: [2.3600009859, 48.86287238],
+          zoom: 14
+        });
+      });
+      arr4.click(function() {
+        console.log("arr4");
+        view.goTo({
+          center: [2.35762962032, 48.8543414263],
+          zoom: 14
+        });
+      });
+      arr5.click(function() {
+        console.log("arr5");
+        view.goTo({
+          center: [2.35071460958, 48.8444431505],
+          zoom: 14
+        });
+      });
+      arr6.click(function() {
+        console.log("arr6");
+        view.goTo({
+          center: [2.33289799905, 48.8491303586],
+          zoom: 14
+        });
+      });
+      arr7.click(function() {
+        console.log("arr7");
+        view.goTo({
+          center: [2.31218769148, 48.8561744288],
+          zoom: 14
+        });
+      });
+      arr8.click(function() {
+        console.log("arr8");
+        view.goTo({
+          center: [2.3125540224, 48.8727208374],
+          zoom: 14
+        });
+      });
+      arr9.click(function() {
+        console.log("arr9");
+        view.goTo({
+          center: [2.33745754348, 48.8771635173],
+          zoom: 14
+        });
+      });
+      arr10.click(function() {
+        console.log("arr10");
+        view.goTo({
+          center: [2.36072848785, 48.8761300365],
+          zoom: 14
+        });
+      });
+      arr11.click(function() {
+        console.log("arr11");
+        view.goTo({
+          center: [2.3800583082, 48.8590592213],
+          zoom: 14
+        });
+      });
+      arr12.click(function() {
+        console.log("arr12");
+        view.goTo({
+          center: [2.42132490078, 48.8349743815],
+          zoom: 14
+        });
+      });
+      arr13.click(function() {
+        console.log("arr13");
+        view.goTo({
+          center: [2.36227244042, 48.8283880317],
+          zoom: 14
+        });
+      });
+      arr14.click(function() {
+        console.log("arr14");
+        view.goTo({
+          center: [2.3265420442, 48.8292445005],
+          zoom: 14
+        });
+      });
+      arr15.click(function() {
+        console.log("arr15");
+        view.goTo({
+          center: [2.29282582242, 48.8400853759],
+          zoom: 14
+        });
+      });
+      arr16.click(function() {
+        console.log("arr16");
+        view.goTo({
+          center: [2.26197078836, 48.8603921054],
+          zoom: 14
+        });
+      });
+      arr17.click(function() {
+        console.log("arr17");
+        view.goTo({
+          center: [2.30677699057, 48.887326522],
+          zoom: 14
+        });
+      });
+      arr18.click(function() {
+        console.log("arr18");
+        view.goTo({
+          center: [2.34816051956, 48.892569268],
+          zoom: 14
+        });
+      });
+      arr19.click(function() {
+        console.log("arr19");
+        view.goTo({
+          center: [2.38482096015, 48.8870759966],
+          zoom: 14
+        });
+      });
+      arr20.click(function() {
+        console.log("arr20");
+        view.goTo({
+          center: [2.40118812928, 48.8634605789],
+          zoom: 14
+        });
+      });
+    });
+  </script>
+
+</head>
+
+<body>
+  <div id="applicationDiv">
+    <div id="viewDiv">
+    </div>
+    <div id="sliderContainer" class="esri-widget">
+      <span id="sliderValue"></span>
+      <div id="sliderInnerContainer">
+        <div id="slider"></div>
+      </div>
+      <div id="playButton" class="esri-widget esri-widget--button toggle-button">
+        <div>
+          <span class="toggle-button-icon esri-icon-play" aria-label="play icon"></span>
+          Lecture
+        </div>
+        <div>
+          <span class="toggle-button-icon esri-icon-pause" aria-label="pause icon"></span>
+          Pause
+        </div>
+      </div>
+    </div>
+    <div id="myContainer" class="esri-widget">
+      <div style="color: #f0f;">Paris Construction<div><span style="font-size: 10px; color: #d1d1d1;">Une application web développée avec l'<a id="apiJS" href="https://developers.arcgis.com/javascript/" target="_blank" onmouseover="hoverLink()" onmouseout="outLink()">API ArcGIS for JavaScript</span><svg class="svg-icon" viewBox="0 0 48 53">
+            <path d="M24.16 2.12L46 8v33.66l-22.14 9.23L2 45V11.9l22.16-9.78M24 0L0 10.6v35.92L24 53l24-10V6.48L24 0zM9 11v30h30V11zm16.33 23.4c0 2.92-1.72 4.25-4.21 4.25a4.37 4.37 0 0 1-4.23-2.58l2.29-1.39c.45.79.85 1.45 1.82 1.45s1.51-.36 1.51-1.77v-9.59h2.82zM32 38.65a5.4 5.4 0 0 1-5.13-2.88l2.29-1.33a3.07 3.07 0 0 0 2.78 1.71c1.17 0 1.91-.58 1.91-1.39 0-1-.76-1.31-2.05-1.87l-.7-.3c-2-.87-3.39-2-3.39-4.25 0-2.12 1.61-3.73 4.13-3.73a4.18 4.18 0 0 1 4 2.26l-2.2 1.41a1.91 1.91 0 0 0-1.81-1.21 1.23 1.23 0 0 0-1.35 1.21c0 .84.53 1.18 1.73 1.71l.71.3c2.39 1 3.74 2.07 3.74 4.43 0 2.54-1.99 3.93-4.66 3.93z">
+            </path>
+          </svg></a></div>
+      </div>
+      <details>
+        <summary style="font-size: 10px; color: #d1d1d1;">Détails</summary>
+        <div style="font-size: 10px; color: #d1d1d1;">
+          <div style="margin-left: 15px;"><u>Source</u> : <a id="openDataUrl" href="https://opendata.apur.org/datasets/Apur::emprise-batie-paris/about" target="_blank" onmouseover="hoverLink2()" onmouseout="outLink2()">https://opendata.apur.org/datasets/Apur::emprise-batie-paris/about</a></div>
+          <!--<div style="margin-left: 15px;"><u>Symbologie</u> : "Bloom effect" / Puissance nominale de la lampe</div>-->
+        </div>
+      </details>
+      <details>
+        <summary style="font-size: 10px; color: #d1d1d1;">Arrondissements</summary>
+        <div style="font-size: 10px; color: #d1d1d1; text-align: center; margin-top: 10px;margin-bottom: 10px;">
+          <div class="btn-group-vertical" role="group">
+            <button id="arr1" type="button" class="btn btn-secondary">1er arr.</button>
+            <button id="arr2" type="button" class="btn btn-secondary">2e arr.</button>
+            <button id="arr3" type="button" class="btn btn-secondary">3e arr.</button>
+            <button id="arr4" type="button" class="btn btn-secondary">4e arr.</button>
+            <button id="arr5" type="button" class="btn btn-secondary">5e arr.</button>
+          </div>
+          <div class="btn-group-vertical" role="group">
+            <button id="arr6" type="button" class="btn btn-secondary">6e arr.</button>
+            <button id="arr7" type="button" class="btn btn-secondary">7e arr.</button>
+            <button id="arr8" type="button" class="btn btn-secondary">8e arr.</button>
+            <button id="arr9" type="button" class="btn btn-secondary">9e arr.</button>
+            <button id="arr10" type="button" class="btn btn-secondary">10e arr.</button>
+          </div>
+          <div class="btn-group-vertical" role="group">
+            <button id="arr11" type="button" class="btn btn-secondary">11e arr.</button>
+            <button id="arr12" type="button" class="btn btn-secondary">12e arr.</button>
+            <button id="arr13" type="button" class="btn btn-secondary">13e arr.</button>
+            <button id="arr14" type="button" class="btn btn-secondary">14e arr.</button>
+            <button id="arr15" type="button" class="btn btn-secondary">15e arr.</button>
+          </div>
+          <div class="btn-group-vertical" role="group">
+            <button id="arr16" type="button" class="btn btn-secondary">16e arr.</button>
+            <button id="arr17" type="button" class="btn btn-secondary">17e arr.</button>
+            <button id="arr18" type="button" class="btn btn-secondary">18e arr.</button>
+            <button id="arr19" type="button" class="btn btn-secondary">19e arr.</button>
+            <button id="arr20" type="button" class="btn btn-secondary">20e arr.</button>
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+
+</body>
+
+</html>
